@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Connecting Spotify…</title><link rel="stylesheet" href="css/style.css"></head>
+<body>
+  <main class="page"><div class="card"><h2 id="t">Connecting to Spotify…</h2><p id="m"></p></div></main>
+  <script src="config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/spotify.js"></script>
+  <script>
+    SG.Spotify.handleCallback()
+      .then((back) => { location.replace(back); })
+      .catch((e) => {
+        if (e.notAllowed) {
+          document.getElementById('t').textContent = 'Spotify didn’t let you in through this app';
+          document.getElementById('m').innerHTML = SG.Spotify.usingOwnApp()
+            ? 'Spotify refused your own app. Check that you are logged in to Spotify with the same account that created the app, that it has Premium, and that the Redirect URI is exactly <code>' + location.origin + '/callback.html</code>. <a href="index.html#ownapp">Back to the steps</a>'
+            : 'Spotify only lets 5 people use this site’s app. You can still play — or connect through your own free Spotify app in about 3 minutes. <a href="index.html#ownapp">Show me how</a> · <a href="index.html">Just play</a>';
+          return;
+        }
+        document.getElementById('t').textContent = 'Spotify connection failed'; document.getElementById('m').innerHTML = SG.escape(e.message) + ' — <a href="library.html#build">back</a>'; });
+  </script>
+</body>
+</html>

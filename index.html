@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guess That Song — Bollywood & English song guessing game</title>
+  <meta name="description" content="Name the song from a split-second clip. Thousands of Bollywood and English hits, search by lyrics, movie or singer.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📻</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="index.html">
+      <span class="wave" id="logoWave"></span>
+      <b>Guess That</b><em>Song</em>
+    </a>
+    <nav class="links">
+      <a href="index.html" class="on">Play</a>
+      <a href="library.html">Song Finder</a>
+      <a href="library.html#build">Add songs</a>
+      <a href="#" id="lbBtn">🏆 Leaderboard</a>
+      <a href="#" id="statsBtn">📊 Stats</a>
+      <a href="#" id="settingsBtn">⚙ Settings</a>
+      <a href="#" id="meChip" class="me-chip" title="Change your leaderboard name"></a>
+    </nav>
+  </header>
+
+  <main class="stage">
+    <div class="radio" id="radio">
+      <div class="side-tabs">
+        <a href="library.html">Song finder</a>
+        <a href="#" id="lbTab">Leaderboard</a>
+        <a href="#" id="statsTab">Stats</a>
+        <a href="library.html#build">My playlists</a>
+      </div>
+      <div class="brand-plate">GUESS · THAT · SONG <span>radio</span></div>
+
+      <div class="screen">
+        <div class="progress-wrap">
+          <div class="label">Preview progress</div>
+          <div class="track" id="track"><div class="unlocked" id="unlocked"></div><div class="fill" id="fill"></div></div>
+          <div class="ticks" id="ticks"></div>
+        </div>
+        <div class="meta">
+          <div class="box"><div class="label">Score</div><div class="v" id="score">0</div></div>
+          <div class="box"><div class="label">Streak</div><div class="v" id="streak">0</div></div>
+          <div class="box"><div class="label">Level</div><div class="v" id="levelTag">LV 1</div></div>
+          <div class="box lives-box"><div class="label">Strikes left</div><div class="v lives" id="lives"></div></div>
+          <button class="btn-new" id="newBtn" title="New song (N)"><span class="i">↻</span>NEW</button>
+        </div>
+      </div>
+
+      <div class="mid">
+        <section class="col-sep filters-col">
+          <div class="label">Mode</div>
+          <div class="lang-switch mode-switch" id="modeSwitch">
+            <button data-mode="easy" title="5 strikes">EASY</button>
+            <button data-mode="medium" title="3 strikes">MEDIUM</button>
+            <button data-mode="hard" title="No strikes — one miss ends the game">HARD</button>
+          </div>
+          <label class="toggle small practice-toggle" title="Every clip length up to 15 s is available at every level. Practice games are not counted on the leaderboard."><input type="checkbox" id="practiceToggle"><span></span>Practice — full 15 s every level <em>(not on leaderboard)</em></label>
+          <div class="label">Language</div>
+          <div class="lang-switch" id="langSwitch">
+            <button data-lang="hi">HINDI</button>
+            <button data-lang="both">BOTH</button>
+            <button data-lang="en">ENGLISH</button>
+          </div>
+          <div class="label">Select era <span class="dim">(pick any)</span></div>
+          <div class="knobs" id="eraKnobs"></div>
+          <div class="label">Genre <span class="dim">(pick any)</span></div>
+          <div class="chips" id="genreChips"></div>
+          <div class="pool-info" id="poolInfo"></div>
+        </section>
+
+        <section class="player-col col-sep">
+          <button class="bigknob" id="playBtn" title="Play clip (Space)">
+            <span class="inner"><b id="playWord">PLAY</b><small id="playLen">0.1 SEC</small></span>
+          </button>
+          <div class="tap" id="tapHint">Tap play to start</div>
+          <div class="grill"></div>
+        </section>
+
+        <section class="guess" id="guessCol">
+          <div id="loginGate" class="login-gate hidden">
+            <h3>Log in to Spotify to play</h3>
+            <p>Spotify only plays 30-second previews to people who aren't logged in, so the clips can't reach the right part of the song. Log in with <b>your own</b> Spotify account (free or Premium) in this browser.</p>
+            <button class="btn" id="gateLogin">Log in to Spotify</button>
+            <p class="muted small">A Spotify login window opens. When you're done, close it and this page reloads by itself. Already logged in? <a href="#" id="gateReload">Reload</a>. If it keeps asking, allow cookies for open.spotify.com (Safari / iPhone and private windows block them).</p>
+          </div>
+          <div id="previewNote" class="preview-note hidden">🔒 Not logged in to Spotify here, so Spotify only plays a 30-second preview of each song — clips come from that part. <a href="#" id="previewLogin">Log in for full songs</a></div>
+          <div id="guessUI">
+            <h3>Name that song</h3>
+            <div class="search">
+              <input id="guessInput" placeholder="Search title, movie, artist or a lyric line…" autocomplete="off" spellcheck="false">
+              <span class="ico">⌕</span>
+              <div class="sugg hidden" id="sugg"></div>
+            </div>
+            <label class="toggle small"><input type="checkbox" id="lyrToggle"><span></span>Lyric search <em id="lyrState"></em></label>
+            <div class="msg" id="msg">Guess the song. A wrong guess or SKIP unlocks more time.</div>
+            <div class="guesses" id="guesses"></div>
+          </div>
+
+          <div id="result" class="result hidden">
+            <div class="gameover hidden" id="rvGameOver"></div>
+            <div class="pill" id="rvPill"></div>
+            <div class="rv-head">
+              <img id="rvCover" alt="">
+              <div>
+                <h2 id="rvTitle"></h2>
+                <div class="rv-artist" id="rvArtist"></div>
+                <div class="rv-sub" id="rvSub"></div>
+              </div>
+            </div>
+            <div class="badges" id="rvBadges"></div>
+            <div class="hookline" id="rvHook"></div>
+            <div class="community hidden" id="rvCommunity"></div>
+            <div class="sp-actions">
+              <button class="btn small" id="likeBtn">♡ Save to Liked Songs</button>
+              <select class="input small" id="plSelect"><option value="">＋ Add to playlist…</option></select>
+              <a class="btn ghost small" id="openSp" target="_blank" rel="noopener">Spotify ↗</a>
+              <a class="btn ghost small" id="lyrBtn" href="#">Lyrics</a>
+            </div>
+            <div class="embed-space"></div>
+          </div>
+          <div class="embed-slot" id="embedSlot"><div id="embedA"></div><div id="embedB"></div><div class="emb-cover"><span>🎵 Mystery song</span></div></div>
+        </section>
+      </div>
+
+      <div class="bottom">
+        <div class="clips" id="clips"><span class="label" style="margin-right:6px">Clip length</span></div>
+        <button class="skipbtn" id="skipBtn" title="Skip (Shift+S)">SKIP →</button>
+      </div>
+      <div class="statusbar">
+        <span><span id="modeName">Easy</span> · Score <b id="score2">0</b> · Best <b id="high">0</b> · Streak <b id="streak2">0</b></span>
+        <span>Round <b id="round">01</b></span>
+      </div>
+    </div>
+  </main>
+
+  <section class="howto" id="howto">
+    <h3>How to play</h3>
+    <p>Pick Hindi, English or both, any eras and any genres. Press <b>PLAY</b> to hear a recognisable line of the song — each round picks one at random (often the chorus), starting with just 0.1 seconds. Each <b>SKIP</b> or wrong guess unlocks a longer clip: 0.1 s → 0.2 s → 0.5 s → 1 s → 3 s → 8 s → 15 s. Faster correct guesses earn more points.</p>
+    <p>Type the song title, the movie, the singer, or <b>a line of the lyrics</b> and pick from the suggestions. Songs are random and never repeat until you reset your played history. Choose a mode: <b>Easy</b> gives you 5 strikes, <b>Medium</b> 3, and <b>Hard</b> none — the first missed song ends the game. A strike is a song you don't get (or give up on). Each mode has its own 🏆 leaderboard for best game score and best streak. Connect Spotify to save songs you like straight to your Liked Songs or a playlist, and to mix your own playlists into the game.</p>
+    <p>Keys: <span class="kbd">Space</span> play · <span class="kbd">↓</span><span class="kbd">↑</span> + <span class="kbd">Enter</span> pick a suggestion · <span class="kbd">Shift</span>+<span class="kbd">S</span> skip · <span class="kbd">N</span> next song.</p>
+    <p class="muted">Audio plays through the official Spotify player — stay logged in to Spotify in this browser for full songs (otherwise Spotify only allows 30-second previews).</p>
+  </section>
+
+  <div class="modal hidden" id="settings">
+    <div class="modal-card">
+      <h2>Settings</h2>
+      <h3>Sound</h3>
+      <p class="muted small">The songs play through Spotify at your device's volume — use your computer's or phone's volume keys (Spotify's player doesn't let websites change its loudness).</p>
+      <label class="vol-row">Radio static &amp; beeps <input type="range" id="fxVol" min="0" max="100" step="5"> <b id="fxVolVal"></b></label>
+      <h3>Search</h3>
+      <label class="toggle"><input type="checkbox" id="setLyr"><span></span>Lyric search (search songs by a line of their lyrics)</label>
+      <p class="muted">Turning it off makes the page lighter (lyrics aren't downloaded) and suggestions only match title, movie and artist.</p>
+      <h3>Spotify</h3>
+      <div class="row"><span id="setSpStatus" class="muted"></span></div>
+      <div class="row">
+        <button class="btn small" id="setConnect">Connect Spotify</button>
+        <button class="btn ghost small" id="setDisconnect">Disconnect</button>
+      </div>
+      <p class="muted small">You don't need to connect to play. Connecting lets you save songs to your Liked Songs or a playlist, import your playlists, and puts your Spotify name on the leaderboard.</p>
+      <details class="more" id="ownAppBox">
+        <summary>Spotify says “not registered” or “user not allowed”? Use your own Spotify app (free, ~3 minutes)</summary>
+        <p class="muted small">Spotify lets each hobby app connect only 5 people, so the site's own app is full. You can make your own app instead; it only needs to work for you. You need Spotify <b>Premium</b>, and Spotify allows one such app per person (if you already have one, just add the address from step 4 to it).</p>
+        <ol class="steps">
+          <li>Open <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> and log in with your Spotify account. Accept the developer terms if asked.</li>
+          <li>Click <b>Create app</b>.</li>
+          <li><b>App name:</b> anything, e.g. <i>My Song Game</i>. <b>App description:</b> anything, e.g. <i>Personal song guessing game</i>. Website: leave empty.</li>
+          <li><b>Redirect URI:</b> paste <code class="redir" id="setRedir"></code> <button class="btn ghost small" id="copyRedir" type="button">Copy</button> and click <b>Add</b>.</li>
+          <li>Under “Which API/SDKs are you planning to use?”, tick <b>Web API</b>. Tick the terms box and click <b>Save</b>.</li>
+          <li>On your app's page, copy the <b>Client ID</b> (a 32-character code — not the Client secret).</li>
+          <li>Paste it here and click <b>Save &amp; connect</b>:</li>
+        </ol>
+        <div class="row"><input class="text-in" id="setClientId" maxlength="40" placeholder="Your Spotify Client ID" autocomplete="off" spellcheck="false"></div>
+        <div class="row"><button class="btn small" id="setClientSave">Save &amp; connect</button><button class="btn ghost small" id="setClientReset">Use the site's app again</button></div>
+        <div class="err" id="setClientErr"></div>
+        <p class="muted small">Your Client ID is stored only in this browser. You'll see Spotify's permission screen once; after that you're connected under your own name. The Client ID is not a password, but never paste your Client <i>secret</i> anywhere.</p>
+      </details>
+      <div class="row" style="justify-content:flex-end"><button class="btn" id="setClose">Done</button></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="statsModal">
+    <div class="modal-card wide">
+      <h2>Your stats</h2>
+      <p class="muted small" id="statsPool"></p>
+      <div id="statsBody"></div>
+      <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn ghost small" id="statsReset">Reset stats</button><button class="btn" id="statsClose">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="nameModal">
+    <div class="modal-card">
+      <h2>Who's playing?</h2>
+      <p class="muted" id="nameNote">Pick a name for the leaderboard. Your scores are saved to this name on this device.</p>
+      <input class="text-in" id="nameIn" maxlength="24" placeholder="Your name" autocomplete="nickname">
+      <div class="err" id="nameErr"></div>
+      <h3>How do you want to listen?</h3>
+      <div class="listen-choices">
+        <button class="choice on" id="choosePreview" type="button"><b>▶ Play without logging in</b><span>Works everywhere, including phones. Spotify plays a 30-second preview of each song, and you can't save songs to your playlists.</span></button>
+        <button class="choice" id="chooseLogin" type="button"><b>🎧 Log in to Spotify</b><span>Full songs, so clips come from the best part. Log in once in this browser (free or Premium). On phones Spotify often can't log in inside the browser — then just play without logging in.</span></button>
+      </div>
+      <p class="muted small" id="nameSpConnect"></p>
+      <div class="row" style="justify-content:flex-end"><button class="btn" id="nameSave">Let's play</button></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="lbModal">
+    <div class="modal-card wide">
+      <h2>🏆 Leaderboard</h2>
+      <div class="lb-tabs" id="lbTabs">
+        <button data-mode="easy" class="on">Easy</button><button data-mode="medium">Medium</button><button data-mode="hard">Hard</button><button data-mode="all">All modes</button>
+      </div>
+      <div class="lb-tabs lb-sub" id="lbBy"><button data-by="score" class="on">Best game score</button><button data-by="streak">Best streak</button></div>
+      <p class="muted small" id="lbHelp"></p>
+      <div id="lbBody">Loading…</div>
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" id="lbClose">Close</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/spotify.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Song Finder & Library — Guess That Song</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📻</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="index.html"><span class="wave" id="logoWave"></span><b>Guess That</b><em>Song</em></a>
+    <nav class="links">
+      <a href="index.html">Play</a>
+      <a href="library.html" id="navFind">Song Finder</a>
+      <a href="library.html#build" id="navBuild">Add songs</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="tabs">
+      <button data-tab="find" class="on">🔎 Song Finder</button>
+      <button data-tab="build">➕ Add songs</button>
+    </div>
+
+    <!-- ============ FINDER ============ -->
+    <section id="tab-find">
+      <div class="card">
+        <h2>Find any song — by lyrics, movie, artist or title</h2>
+        <p>Type a line you remember (Hinglish or Devanagari), a movie name or a singer. Spelling variations like <i>kyun/kyon</i>, <i>hai/hain</i>, <i>zindagi/jindagi</i> are matched.</p>
+        <div class="bigsearch"><input id="q" placeholder="e.g. “tere bina kya wajood mera”, “Aashiqui 2”, “Arijit Singh”…" autocomplete="off" spellcheck="false"></div>
+        <div class="filters">
+          <div class="grp"><span class="label">Language</span><div class="lang-switch" id="fLang" style="margin:0"><button data-lang="hi">HINDI</button><button data-lang="both" class="on">BOTH</button><button data-lang="en">ENGLISH</button></div></div>
+          <div class="grp" id="fEra"><span class="label">Era</span></div>
+        </div>
+        <div class="filters"><div class="grp" id="fGenre"><span class="label">Genre</span></div></div>
+        <div class="filters">
+          <label class="toggle"><input type="checkbox" id="lyrToggle2"><span></span>Search inside lyrics</label>
+          <label class="muted"><input type="checkbox" id="showOff"> show disabled songs</label>
+          <span class="muted" id="count"></span>
+        </div>
+      </div>
+
+      <div class="split">
+        <div>
+          <div class="results" id="results"></div>
+          <div class="pager" id="pager"></div>
+        </div>
+        <aside class="card detail" id="detail">
+          <h2>Pick a song</h2>
+          <p>Click any result to play it, read the lyrics and fine-tune where the game's clip starts.</p>
+          <div class="embed-box"><div id="embed2"></div></div>
+          <div id="dBody"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ BUILD ============ -->
+    <section id="tab-build" class="hidden">
+      <div class="card">
+        <h2>1 · Connect your Spotify</h2>
+        <p>Connecting lets you import your own playlists and Liked Songs, and save songs from the game to your Liked Songs or a playlist. Songs you import here are kept in this browser and mixed into your game.</p>
+        <div class="row">
+          <button class="btn" id="connectBtn">Connect Spotify</button>
+          <button class="btn ghost" id="logoutBtn">Disconnect</button>
+          <span class="muted" id="spStatus"></span>
+        </div>
+        <details class="more">
+          <summary>Spotify says “not registered” / you can't connect?</summary>
+          <p>Spotify only lets a small number of people use a hobby app. Either ask the site owner to add your Spotify email, or use your <b>own free Spotify developer app</b> (needs Spotify Premium):</p>
+          <ol class="muted">
+            <li>Open <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> → <b>Create app</b>.</li>
+            <li>Redirect URI: <code id="redir"></code> · tick <b>Web API</b> · Save.</li>
+            <li>Copy the <b>Client ID</b>, paste it below, then click <b>Connect Spotify</b>.</li>
+          </ol>
+          <div class="row"><input class="input" id="clientId" size="40" placeholder="Your Spotify Client ID"></div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>2 · Import a Spotify playlist</h2>
+        <p>Spotify only lets apps read playlists <b>you own or collaborate on</b>. For anyone else's playlist: open it in the Spotify app → ⋯ → <i>Add to other playlist → New playlist</i>, then import your copy.</p>
+        <div class="row">
+          <input class="input" id="plUrl" size="52" placeholder="https://open.spotify.com/playlist/…">
+          <select class="input" id="myPl"><option value="">…or choose one of your playlists</option></select>
+          <button class="btn ghost" id="loadMyPl">Load my playlists</button>
+        </div>
+        <div class="row"><span class="label">Language</span>
+          <select class="input" id="plLang"><option value="auto">Auto-detect</option><option value="hi">Hindi</option><option value="en">English</option></select>
+          <span class="label">Genres</span><div class="chips" id="plGenres" style="margin:0"></div>
+          <span class="muted">(leave empty to auto-tag)</span>
+        </div>
+        <div class="row">
+          <button class="btn" id="importPl">Import playlist</button>
+          <button class="btn ghost" id="importLiked">Import my Liked Songs</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>3 · Add a single song</h2>
+        <div class="row">
+          <input class="input" id="spQ" size="52" placeholder="Search Spotify: song name, artist…">
+          <button class="btn ghost" id="spSearch">Search</button>
+        </div>
+        <div class="row"><span class="label">Language</span>
+          <select class="input" id="oneLang"><option value="auto">Auto-detect</option><option value="hi">Hindi</option><option value="en">English</option></select>
+          <span class="label">Genres</span><div class="chips" id="oneGenres" style="margin:0"></div>
+        </div>
+        <div class="results" id="spResults"></div>
+      </div>
+
+      <div class="card">
+        <h2>Library status &amp; progress</h2>
+        <div class="stats" id="stats"></div>
+        <div class="row">
+          <button class="btn owner-only" id="importHits">Import popular songs up to 20,000 (2010–2020 first)</button>
+          <button class="btn ghost owner-only" id="importNotable">Import well-known English songs (no Spotify needed)</button>
+          <button class="btn ghost owner-only" id="importWiki">Import English &amp; more (via Wikidata IDs)</button>
+          <button class="btn ghost owner-only" id="refreshCues">Find random-line clips for older songs</button>
+          <button class="btn ghost owner-only" id="importArtists">Search-free import (soundtracks &amp; artists)</button>
+          <button class="btn owner-only" id="importAlbums">Import soundtracks &amp; albums</button>
+          <button class="btn ghost owner-only" id="importSeeds">Import curated songs</button>
+          <button class="btn ghost owner-only" id="retryFailed">Retry songs not found</button>
+          <button class="btn ghost owner-only" id="refetchLyrics">Re-fetch missing lyrics</button>
+          <button class="btn ghost hidden" id="stopBtn">Stop</button>
+        </div>
+        <p class="muted owner-only">Imports are throttled to stay inside Spotify's limits (≈45 requests a minute). If Spotify still says “slow down”, the import pauses and continues on its own — keep this tab open. Run <code>python make_dist.py</code> afterwards and upload <code>dist</code> to Cloudflare to publish.</p>
+        <div class="bar"><i id="bar"></i></div>
+        <div class="log" id="log"></div>
+      </div>
+    </section>
+  </main>
+  <div class="toast" id="toast"></div>
+
+  <script src="config.js"></script>
+  <script src="data/seeds.js" onerror="window.SEEDS=''"></script>
+  <script src="data/albums.js" onerror="window.ALBUMS=''"></script>
+  <script src="js/common.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/spotify.js"></script>
+  <script src="js/builder.js"></script>
+  <script src="js/library.js"></script>
+</body>
+</html>
